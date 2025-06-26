@@ -33,6 +33,7 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+
   /user/signup:
     post:
       tags:
@@ -57,6 +58,7 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+
   /user/profile:
     get:
       security:
@@ -65,17 +67,16 @@ paths:
         - User Module
       summary: User Profile API
       description: API for fetching a user profile
-      #produces:
-       # - application/json
       responses:
         '200':
-          description: User profile retrieved successully
+          description: User profile retrieved successfully
           schema:
             $ref: '#/definitions/ApiResponse'
         '400':
           description: Invalid Fields
         '500':
           description: Internal Server Error
+
     put:
       security:
         - Bearer: []
@@ -94,18 +95,107 @@ paths:
         - application/json
       responses:
         '200':
-          description: User profile retrieved successully
+          description: User profile updated successfully
           schema:
             $ref: '#/definitions/ApiResponse'
         '400':
           description: Invalid Fields
         '500':
           description: Internal Server Error
+
+  /user/accounts:
+    get:
+      summary: Récupère la liste des comptes de l'utilisateur
+      description: Retourne tous les comptes associés à l'utilisateur authentifié
+      tags:
+        - Transactions
+      security:
+        - Bearer: []
+      responses:
+        '200':
+          description: Liste des comptes
+        '401':
+          description: Non autorisé
+
+  /user/accounts/{accountId}/transactions:
+    get:
+      summary: Récupère les transactions d'un compte pour le mois courant
+      tags:
+        - Transactions
+      security:
+        - Bearer: []
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          type: string
+          description: ID du compte
+      responses:
+        '200':
+          description: Liste des transactions
+        '401':
+          description: Non autorisé
+        '404':
+          description: Compte non trouvé
+
+  /user/transactions/{transactionId}:
+    get:
+      summary: Récupère le détail d'une transaction spécifique
+      tags:
+        - Transactions
+      security:
+        - Bearer: []
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+          description: ID de la transaction
+      responses:
+        '200':
+          description: Détail de la transaction
+        '401':
+          description: Non autorisé
+        '404':
+          description: Transaction non trouvée
+
+    patch:
+      summary: Met à jour une transaction (note, catégorie)
+      tags:
+        - Transactions
+      security:
+        - Bearer: []
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: transactionUpdate
+          required: true
+          schema:
+            type: object
+            properties:
+              category:
+                type: string
+              note:
+                type: string
+      responses:
+        '200':
+          description: Transaction mise à jour
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non autorisé
+        '404':
+          description: Transaction non trouvée
+
 securityDefinitions:
   Bearer:
     type: apiKey
     name: Authorization
     in: header
+
 definitions:
   User:
     properties:
@@ -124,6 +214,7 @@ definitions:
       userName:
         type: string
         description: user public name
+
   Login:
     properties:
       email:
@@ -132,6 +223,7 @@ definitions:
       password:
         type: string
         description: user password
+
   ApiResponse:
     type: object
     properties:
@@ -146,11 +238,13 @@ definitions:
             type: string
           email:
             type: string
+
   LoginResponse:
     type: object
     properties:
       token:
         type: string
+
   UserProfile:
     type: object
     properties:
