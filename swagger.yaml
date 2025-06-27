@@ -1,13 +1,16 @@
+
 swagger: '2.0'
 info:
-  title: Bank Argent API documentation
-  description: Contains all available API endpoints in this codebase
+  title: Argent Bank API documentation
+  description: API pour gérer les utilisateurs et les transactions bancaires
   version: '1.0.0'
   termsOfService: 'http://swagger.io/terms/'
+
 host: localhost:3001
 basePath: /api/v1
 schemes:
   - http
+
 paths:
   /user/login:
     post:
@@ -114,6 +117,10 @@ paths:
       responses:
         '200':
           description: Liste des comptes
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Account'
         '401':
           description: Non autorisé
 
@@ -133,6 +140,10 @@ paths:
       responses:
         '200':
           description: Liste des transactions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transaction'
         '401':
           description: Non autorisé
         '404':
@@ -154,6 +165,8 @@ paths:
       responses:
         '200':
           description: Détail de la transaction
+          schema:
+            $ref: '#/definitions/Transaction'
         '401':
           description: Non autorisé
         '404':
@@ -170,16 +183,12 @@ paths:
           in: path
           required: true
           type: string
+          description: ID de la transaction à modifier
         - in: body
           name: transactionUpdate
           required: true
           schema:
-            type: object
-            properties:
-              category:
-                type: string
-              note:
-                type: string
+            $ref: '#/definitions/TransactionUpdate'
       responses:
         '200':
           description: Transaction mise à jour
@@ -197,6 +206,36 @@ securityDefinitions:
     in: header
 
 definitions:
+  Login:
+    properties:
+      email:
+        type: string
+        description: user email
+      password:
+        type: string
+        description: user password
+
+  LoginResponse:
+    type: object
+    properties:
+      token:
+        type: string
+
+  ApiResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      body:
+        type: object
+        properties:
+          id:
+            type: string
+          email:
+            type: string
+
   User:
     properties:
       email:
@@ -215,38 +254,62 @@ definitions:
         type: string
         description: user public name
 
-  Login:
-    properties:
-      email:
-        type: string
-        description: user email
-      password:
-        type: string
-        description: user password
-
-  ApiResponse:
-    type: object
-    properties:
-      status:
-        type: integer
-      message:
-        type: string
-      body:
-        type: object
-        properties:
-          id:
-            type: string
-          email:
-            type: string
-
-  LoginResponse:
-    type: object
-    properties:
-      token:
-        type: string
-
   UserProfile:
     type: object
     properties:
       userName:
         type: string
+
+  Account:
+    type: object
+    properties:
+      accountId:
+        type: string
+        example: acc-123456
+      type:
+        type: string
+        example: Checking
+      balance:
+        type: number
+        example: 2500.75
+      currency:
+        type: string
+        example: USD
+
+  Transaction:
+    type: object
+    properties:
+      date:
+        type: string
+        example: "27/02/20"
+      description:
+        type: string
+        example: "Golden Sun Bakery"
+      amount:
+        type: string
+        example: "$8.00"
+      balance:
+        type: string
+        example: "$298.00"
+      type:
+        type: string
+        example: "Electronic"
+      category:
+        type: string
+        example: "Food"
+      note:
+        type: string
+        example: "lorem ipsum"
+
+  TransactionUpdate:
+    type: object
+    properties:
+      category:
+        type: string
+        example: "Food"
+      note:
+        type: string
+        example: "lorem ipsum"
+    required:
+      - category
+      - note
